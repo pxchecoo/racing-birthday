@@ -3,17 +3,21 @@ import {
   remainingTime,
   calendarContent,
   EVENT,
+  DEFAULT_SETTINGS,
+  eventInstant,
   DIRECTIONS_URL,
 } from "../src/lib/event";
 import { validateRsvp } from "../src/lib/rsvp";
 describe("event time and links", () => {
   it("uses 19:00 UTC for 3 PM Puerto Rico, independently of viewer timezone", () => {
-    expect(new Date(EVENT.startsAt).toISOString()).toBe(
+    expect(new Date(eventInstant(DEFAULT_SETTINGS)).toISOString()).toBe(
       "2026-10-24T19:00:00.000Z",
     );
   });
   it("counts each unit correctly", () => {
-    expect(remainingTime(Date.parse(EVENT.startsAt) - 90061000)).toEqual({
+    expect(
+      remainingTime(Date.parse(eventInstant(DEFAULT_SETTINGS)) - 90061000),
+    ).toEqual({
       days: 1,
       hours: 1,
       minutes: 1,
@@ -22,7 +26,9 @@ describe("event time and links", () => {
     });
   });
   it("never becomes negative after the event", () => {
-    expect(remainingTime(Date.parse(EVENT.startsAt) + 10000).total).toBe(0);
+    expect(
+      remainingTime(Date.parse(eventInstant(DEFAULT_SETTINGS)) + 10000).total,
+    ).toBe(0);
   });
   it("exports UTC ICS with escaped location and no invented end time", () => {
     expect(calendarContent()).toContain("DTSTART:20261024T190000Z\r\n");

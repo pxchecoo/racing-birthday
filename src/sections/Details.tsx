@@ -1,8 +1,10 @@
+import { useEvent } from "../hooks/useEvent";
 import { ArrowUpRight, CalendarPlus, MapPin } from "lucide-react";
 import { Reveal } from "../components/Reveal";
 import { Magnetic } from "../components/Magnetic";
 import { DIRECTIONS_URL, downloadCalendar } from "../lib/event";
 export function Details() {
+  const { settings, labels } = useEvent();
   return (
     <>
       <section
@@ -30,17 +32,21 @@ export function Details() {
             </div>
             <div className="date-block">
               <div className="date-top">
-                <span>SATURDAY</span>
-                <span>2026</span>
+                <span>{labels.weekday}</span>
+                <span>{labels.year}</span>
               </div>
               <div className="big-date">
-                24<span>OCT</span>
+                {labels.day}
+                <span>{labels.month}</span>
               </div>
               <div className="time-row">
-                <span>3:00 PM</span>
+                <span>{labels.time}</span>
                 <span>PUERTO RICO · AST</span>
               </div>
-              <button className="text-button" onClick={downloadCalendar}>
+              <button
+                className="text-button"
+                onClick={() => downloadCalendar(settings)}
+              >
                 Save the date <CalendarPlus size={18} />
               </button>
             </div>

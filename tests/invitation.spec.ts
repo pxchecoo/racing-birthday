@@ -1,6 +1,20 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 const endpoint = "**/rest/v1/birthday_rsvps*";
+test.beforeEach(async ({ page }) => {
+  await page.route("**/rest/v1/event_settings*", (route) =>
+    route.fulfill({
+      json: [
+        {
+          id: 1,
+          event_date: "2026-10-24",
+          event_time: "15:00:00",
+          updated_at: "2026-09-23T12:00:00Z",
+        },
+      ],
+    }),
+  );
+});
 test("responsive layouts, assets, navigation and accessibility", async ({
   page,
 }) => {

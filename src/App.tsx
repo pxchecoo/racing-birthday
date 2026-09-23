@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useEvent } from "./hooks/useEvent";
 import { MotionConfig } from "motion/react";
 import { Header } from "./components/Header";
 import { Hero } from "./sections/Hero";
@@ -5,6 +7,20 @@ import { Details } from "./sections/Details";
 import { Countdown } from "./sections/Countdown";
 import { Rsvp } from "./sections/Rsvp";
 export default function App() {
+  const { labels } = useEvent();
+  useEffect(() => {
+    const title = `Racing Birthday · ${labels.shortDate}`;
+    const description = `You’re invited to a racing birthday experience on ${labels.date} at ${labels.time}. El Conquistador, Puerto Rico.`;
+    document.title = title;
+    document
+      .querySelector('meta[property="og:title"]')
+      ?.setAttribute("content", title);
+    for (const selector of [
+      'meta[name="description"]',
+      'meta[property="og:description"]',
+    ])
+      document.querySelector(selector)?.setAttribute("content", description);
+  }, [labels.date, labels.shortDate, labels.time]);
   return (
     <MotionConfig reducedMotion="user">
       <Header />
@@ -17,7 +33,7 @@ export default function App() {
           <i />
           <span>ANOTHER LAP AROUND THE SUN</span>
           <i />
-          <span>OCTOBER 24</span>
+          <span>{labels.shortDate.toUpperCase()}</span>
           <i />
           <span>FULL THROTTLE</span>
         </div>
@@ -31,7 +47,8 @@ export default function App() {
         </a>
         <span>ONE DAY. ONE CREW. ONE UNFORGETTABLE LAP.</span>
         <span>
-          OCT 24 / 2026 <span className="red">↗</span>
+          {labels.month} {labels.day} / {labels.year}{" "}
+          <span className="red">↗</span>
         </span>
       </footer>
     </MotionConfig>

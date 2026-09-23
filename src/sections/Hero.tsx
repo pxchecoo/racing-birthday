@@ -1,3 +1,4 @@
+import { useEvent } from "../hooks/useEvent";
 import { useRef } from "react";
 import {
   motion,
@@ -11,6 +12,7 @@ import { ArrowDown, ArrowUpRight, CalendarPlus } from "lucide-react";
 import { Magnetic } from "../components/Magnetic";
 import { downloadCalendar } from "../lib/event";
 export function Hero() {
+  const { settings, labels } = useEvent();
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -72,14 +74,17 @@ export function Hero() {
                 Join the grid <ArrowUpRight size={18} />
               </a>
             </Magnetic>
-            <button className="button button-quiet" onClick={downloadCalendar}>
+            <button
+              className="button button-quiet"
+              onClick={() => downloadCalendar(settings)}
+            >
               <CalendarPlus size={17} /> Add to calendar
             </button>
           </div>
         </div>
         <div className="hero-art">
           <span className="edition-number" aria-hidden="true">
-            24
+            {labels.day}
           </span>
           <div className="orbit orbit-one" />
           <div className="orbit orbit-two" />
@@ -110,12 +115,12 @@ export function Hero() {
       <div className="hero-bottom">
         <div>
           <span className="micro">RACE DAY</span>
-          <strong>October 24, 2026</strong>
+          <strong>{labels.date}</strong>
         </div>
         <div>
           <span className="micro">LIGHTS OUT</span>
           <strong>
-            3:00 PM <span className="muted">AST</span>
+            {labels.time} <span className="muted">AST</span>
           </strong>
         </div>
         <div className="hero-destination">

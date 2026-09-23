@@ -92,7 +92,7 @@ npm run test:e2e
 
 E2E tests start a separate Vite instance on port 4174 with clearly fake test keys and intercept Supabase requests. They verify success, decline, errors, repeat-submission IDs, calendar download, layout at 320–1920 pixels, image loading, and WCAG A/AA checks. They do **not** prove connectivity or RLS in a real Supabase project. Production database checks must be performed separately after provisioning.
 
-The countdown uses the explicit instant `2026-10-24T15:00:00-04:00` (19:00 UTC), independent of the visitor's time zone. Calendar files use UTC and deliberately omit an unprovided event end time. At the event instant the countdown stops at zero.
+The countdown derives its instant from the Supabase event settings with an explicit Puerto Rico UTC−04:00 offset, independent of the visitor's time zone. Calendar files use UTC and deliberately omit an unprovided event end time. At the event instant the countdown stops at zero.
 
 ## Structure
 
@@ -113,4 +113,64 @@ tests/             Unit, browser, accessibility checks
 docs/              Artwork provenance and verification record
 ```
 
-Edit event content in `src/lib/event.ts` and the section copy together; update HTML metadata and calendar UID if repurposing the invitation. There is no invented attendee name, age, or event end time.
+Change the event date and time in Race Control; static venue information remains in `src/lib/event.ts`. There is no invented attendee name, age, or event end time.
+
+## Race Control (private admin)
+
+Open **https://pxchecoo.github.io/racing-birthday/admin/**. The existing Vite build now produces both `dist/index.html` and `dist/admin/index.html`; GitHub Pages serves the admin directly, including refreshes, without a hash router or a custom 404 redirect. The public invitation layout and RSVP insert flow are preserved.
+
+The panel provides password login, four-hour sessions, Log Out, event date/time settings, and a newest-first RSVP list with basic statistics. On mobile the table becomes cards. **Going** counts attending responses; **Total Guests** includes those respondents plus their additional guests. Responses are loaded privately through the Edge Function; no guest list is present in public assets or browser storage.
+
+### Server-side setup (already completed for this project)
+
+The additive migration is `supabase/migrations/202609230001_race_control.sql`. For a fresh installation, apply `supabase/schema.sql` first, then this migration. It preserves the RSVP table and its existing policies. The migration creates:
+
+- `event_settings`: one row (`id = 1`), publicly readable, writable only by the service role.
+- `admin_sessions`: hashed opaque session tokens and expiration times, with no public grants or policies.
+- `admin_login_limits`: server-only atomic rate-limit counters.
+- `consume_admin_login_attempt`: service-role-only RPC for persistent login throttling.
+
+```bash
+npx supabase db query --linked --project-ref YOUR_PROJECT_REF --file supabase/migrations/202609230001_race_control.sql
+npx supabase functions deploy race-control --project-ref YOUR_PROJECT_REF --use-api
+```
+
+In Supabase Edge Function Secrets configure:
+
+| Secret                                       | Purpose                                                                                    |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `ADMIN_PASSWORD`                             | The administrator password; set only in Supabase, never in source or a `VITE_` variable    |
+| `ADMIN_ALLOWED_ORIGINS`                      | Comma-separated allowed browser origins; production origin is `https://pxchecoo.github.io` |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Injected automatically by Supabase into Edge Functions; never copy into the frontend       |
+
+The current server also permits `http://127.0.0.1:5173` and `http://127.0.0.1:4173` for local verification. CORS restricts browser origins; the session check independently authorizes every administrative operation.
+
+Use the Supabase dashboard to change `ADMIN_PASSWORD`. Never place its value in README, shell history examples, tests, workflow arguments, or a committed environment file. To revoke all outstanding sessions after changing a password, run `delete from public.admin_sessions;` privately as the project owner.
+
+### Authentication and privacy
+
+The `race-control` Edge Function handles `login`, `dashboard`, `save_settings`, and `logout`. The platform's legacy JWT check is disabled because this function uses its own authorization: an anon project key is **never** accepted as an admin credential. After a correct server-side password check, the function returns a cryptographically random 256-bit token with a four-hour expiry. The browser keeps it in `sessionStorage` so refreshes work; only its SHA-256 hash is stored in the server-only session table. Dashboard reads and schedule updates require an unexpired server-side session. Logout deletes the session, making its token unusable immediately.
+
+Persistent login limits allow five attempts per IP and thirty overall per 15-minute window. The counters are updated atomically in Postgres so separate Edge Function instances cannot reset them. Passwords are compared using equal-length digests. Error responses never echo secrets, request bodies, or database internals. Administrative responses use `Cache-Control: no-store`.
+
+RLS remains enabled and forced. The existing `birthday_rsvps` table still grants public visitors INSERT only. It has **no anonymous SELECT policy**. Guests also cannot edit the event, inspect admin sessions, or call the login-limit RPC.
+
+### Dynamic event date
+
+Manage the schedule in Race Control. The public page reads the single `event_settings` record and updates its hero date, decorative day, weekday/month/year, marquee, footer, details, countdown, RSVP confirmation, metadata, and downloadable calendar. Puerto Rico is represented explicitly as `America/Puerto_Rico` / UTC−04:00, independently of the viewer's local timezone.
+
+Public tabs in the same browser update immediately through the public settings cache. Other visitors refresh their settings every 30 seconds while visible, and on focus/return to the page. A last-known local cache and one centralized original-date fallback keep the invitation usable during network outages. Calendar events keep their original stable UID and use the current schedule.
+
+Static HTML/social metadata omits a fixed date so non-JavaScript crawlers never receive a stale schedule; browser metadata updates from Supabase. No GitHub deployment is needed when saving a new event date.
+
+### Admin files and tests
+
+- `admin/index.html`, `src/pages/Admin.tsx`, `src/styles/admin.css`: direct entry, session lifecycle, and isolated styling.
+- `src/components/admin/`: login, event editor, statistics, responsive RSVP list.
+- `src/lib/admin.ts`: private function client, session storage, statistics.
+- `src/lib/event-store.ts`, `src/hooks/useEvent.ts`, `src/lib/event.ts`: shared dynamic schedule.
+- `supabase/functions/race-control/`: server-only authorization, validation, and database access.
+- `supabase/config.toml`, `supabase/migrations/202609230001_race_control.sql`: function and database configuration.
+- `tests/admin.test.ts`, `tests/admin.spec.ts`: server-side helper tests and browser coverage for login, sessions, logout, settings, statistics, mobile, and cross-tab public updates.
+
+Run `npm run build`, `npm run lint`, `npm test`, and `npm run test:e2e`. Optional Edge Function type check: `npx deno check --no-lock supabase/functions/race-control/index.ts`. The existing GitHub Pages workflow continues to deploy `main`; redeploy the Edge Function explicitly when changing server-side code. Frontend builds never receive the admin password or service role key.

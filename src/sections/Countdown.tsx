@@ -1,12 +1,15 @@
+import { useEvent } from "../hooks/useEvent";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Reveal } from "../components/Reveal";
 import { remainingTime } from "../lib/event";
 export function Countdown() {
-  const [time, setTime] = useState(remainingTime);
+  const { settings, labels } = useEvent();
+  const [now, setNow] = useState(Date.now);
+  const time = remainingTime(now, settings);
   const reduced = useReducedMotion();
   useEffect(() => {
-    const id = setInterval(() => setTime(remainingTime()), 1000);
+    const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
   return (
@@ -27,7 +30,9 @@ export function Countdown() {
               ? "Every second brings us closer."
               : "It’s race day. Let’s celebrate."}
           </h2>
-          <p>October 24 · 3:00 PM · Puerto Rico</p>
+          <p>
+            {labels.shortDate} · {labels.time} · Puerto Rico
+          </p>
         </div>
         <div
           className="countdown"

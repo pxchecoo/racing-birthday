@@ -1,3 +1,4 @@
+import { useEvent } from "../hooks/useEvent";
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -14,6 +15,7 @@ import { Reveal } from "../components/Reveal";
 import { isRsvpConfigured, submitRsvp } from "../lib/supabase";
 import { validateRsvp } from "../lib/rsvp";
 export function Rsvp() {
+  const { labels } = useEvent();
   const [attending, setAttending] = useState(true);
   const [guests, setGuests] = useState(0);
   const [status, setStatus] = useState<
@@ -139,7 +141,7 @@ export function Rsvp() {
                   </h3>
                   <p>
                     {attending
-                      ? `October 24 at 3:00 PM. ${guests ? `You + ${guests} ${guests === 1 ? "guest" : "guests"}. ` : ""}See you at the starting line.`
+                      ? `${labels.shortDate} at ${labels.time}. ${guests ? `You + ${guests} ${guests === 1 ? "guest" : "guests"}. ` : ""}See you at the starting line.`
                       : "Thanks for letting us know. You’ll be there in spirit."}
                   </p>
                   <a href="#details" className="text-button">

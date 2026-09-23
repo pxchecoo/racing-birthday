@@ -1,0 +1,5 @@
+project_id = "racing-birthday"
+
+[functions.race-control]
+# This function verifies its own opaque admin session. An anon JWT is never admin authorization.
+verify_jwt = false
