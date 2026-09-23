@@ -5,6 +5,8 @@ A premium, responsive motorsport birthday invitation for **October 24, 2026 at 3
 **Live invitation:** https://pxchecoo.github.io/racing-birthday/  
 **Location:** Avenida Diego Velázquez N-12, El Conquistador, Puerto Rico.
 
+The Supabase project, table, INSERT-only policies, GitHub Actions secrets, and GitHub Pages deployment are already configured. See the [verification report](docs/verification.md) for measured production results.
+
 ## Experience
 
 Original chrome helmet artwork, smooth pointer tilt, a scroll-driven perspective transition, restrained magnetic buttons, a live countdown, a downloadable calendar event, Google Maps directions, and an animated private RSVP form. All motion respects reduced-motion preferences. No third-party tracking, autoplay audio, public guest list, or racing brand logos.
@@ -106,9 +108,9 @@ public/
 supabase/
   schema.sql        Table, constraints, grants, INSERT-only RLS
 scripts/            Frontend credential checks
- tests/             Unit, browser, accessibility checks
+tests/             Unit, browser, accessibility checks
 .github/workflows/  Automatic Pages deployment
- docs/              Artwork provenance and verification record
+docs/              Artwork provenance and verification record
 ```
 
 Edit event content in `src/lib/event.ts` and the section copy together; update HTML metadata and calendar UID if repurposing the invitation. There is no invented attendee name, age, or event end time.
