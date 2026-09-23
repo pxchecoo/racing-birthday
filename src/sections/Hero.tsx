@@ -90,7 +90,7 @@ export function Hero() {
             <img
               className="helmet"
               src={`${import.meta.env.BASE_URL}assets/helmet.webp`}
-              srcSet={`${import.meta.env.BASE_URL}assets/helmet-small.webp 640w, ${import.meta.env.BASE_URL}assets/helmet.webp 1200w`}
+              srcSet={`${import.meta.env.BASE_URL}assets/helmet-small.webp 640w, ${import.meta.env.BASE_URL}assets/helmet-medium.webp 800w, ${import.meta.env.BASE_URL}assets/helmet.webp 1200w`}
               sizes="(max-width: 700px) 90vw, 55vw"
               width="1200"
               height="1200"

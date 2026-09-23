@@ -26,7 +26,7 @@ export default function App() {
         <Rsvp />
       </main>
       <footer className="footer">
-        <a className="brand-mark" href="#" aria-label="Back to top">
+        <a className="brand-mark" href="#" aria-label="R·B — back to top">
           R<span>·</span>B
         </a>
         <span>ONE DAY. ONE CREW. ONE UNFORGETTABLE LAP.</span>

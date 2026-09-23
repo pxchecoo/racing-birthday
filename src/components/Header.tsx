@@ -10,7 +10,11 @@ export function Header() {
         Skip to invitation
       </a>
       <header className="header">
-        <a className="wordmark" href="#" aria-label="Racing birthday home">
+        <a
+          className="wordmark"
+          href="#"
+          aria-label="R·B Birthday Racing Experience — home"
+        >
           <span className="brand-mark" aria-hidden="true">
             R<span>·</span>B
           </span>

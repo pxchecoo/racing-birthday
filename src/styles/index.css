@@ -1,5 +1,12 @@
 @import "tailwindcss";
-@font-face { font-family: "Inter Variable"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2"); }
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2")
+    format("woff2");
+}
 @theme {
   --color-racing: #ed332b;
   --font-sans: "Inter Variable", sans-serif;
@@ -1552,5 +1559,11 @@ textarea {
   }
   .hero-stage {
     will-change: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .helmet {
+    animation: none;
   }
 }

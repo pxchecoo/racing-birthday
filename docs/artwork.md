@@ -2,7 +2,7 @@
 
 Generated with the built-in ImageGen tool for this project. No protected motorsport logos or third-party images are used.
 
-Final website assets: `public/assets/helmet.webp` (1200 × 1200) and `public/assets/helmet-small.webp` (640 × 640). WebP conversion and resizing use Sharp. The original generation is retained outside the repository in the local ImageGen output directory.
+Final website assets: `public/assets/helmet.webp` (1200 × 1200) , `public/assets/helmet-medium.webp` (800 × 800), and `public/assets/helmet-small.webp` (640 × 640). WebP conversion and resizing use Sharp. The original generation is retained outside the repository in the local ImageGen output directory.
 
 Prompt:
 
